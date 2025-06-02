@@ -315,8 +315,10 @@ class MoodWindow(QWidget):
         self.spinner_timer.start(150)
 
         # Show final emoji after animation
-        QTimer.singleShot(SPINNER_DURATION_MS - 500, self.show_final_emoji)  # Show final emoji slightly before closing
-        QTimer.singleShot(SPINNER_DURATION_MS, self.close)
+        QTimer.singleShot(SPINNER_DURATION_MS - 500, self.show_final_emoji)  # Show final emoji slightly before animation ends
+        
+        # Save the mood data
+        save_mood(self.selected_mood)
 
     def update_spinner_frame(self):
         # Update the spinner frame
