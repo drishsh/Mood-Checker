@@ -3,7 +3,7 @@ import getpass
 from datetime import datetime, date
 import csv
 from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-                              QPushButton, QLabel, QSystemTrayIcon, QMessageBox)
+                              QPushButton, QLabel, QSystemTrayIcon, QMessageBox, QSizePolicy)
 from PySide6.QtGui import QLinearGradient, QPainter, QColor, QIcon, QPixmap
 from PySide6.QtCore import Qt, QTimer
 import sys
@@ -101,32 +101,54 @@ def save_mood(mood):
 class MoodWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(800, 450)
+        # Set window flags to show standard window decorations
+        self.setWindowFlags(
+            Qt.Window |  # Use Window to get standard title bar
+            Qt.WindowTitleHint |  # Show title
+            Qt.WindowSystemMenuHint |  # Show system menu
+            Qt.WindowMinimizeButtonHint |  # Show minimize button
+            Qt.WindowMaximizeButtonHint |  # Show maximize button
+            Qt.WindowCloseButtonHint  # Show close button
+        )
+        # Set minimum size but allow resizing
+        self.setMinimumSize(800, 450)
         self.setWindowTitle("Mood Check-in")
         self.setStyleSheet("""
             background-color: #ffffff;
             border-radius: 20px;
             font-family: Arial, Helvetica, sans-serif;
         """)
-        self.center_window()
+        
         self.selected_mood = None
         self.selected_button = None
         self.spinner_label = None
         self.spinner_timer = None
         self.spinner_index = 0
- 
-        self.emoji_layouts = []   # ✅ Store emoji layouts
-        self.send_button = None   # ✅ Store send button
- 
+        
+        # Create a central container widget to maintain fixed size
+        self.central_widget = QWidget(self)
+        self.central_widget.setFixedSize(800, 450)
+        self.central_widget.setStyleSheet("""
+            background-color: #ffffff;
+            border-radius: 20px;
+        """)
+        
         self.init_ui()
- 
+        self.center_window()
+
+    def resizeEvent(self, event):
+        """Handle window resize events by keeping the central widget centered"""
+        super().resizeEvent(event)
+        # Center the fixed-size central widget in the window
+        central_x = (event.size().width() - self.central_widget.width()) // 2
+        central_y = (event.size().height() - self.central_widget.height()) // 2
+        self.central_widget.move(central_x, central_y)
+
     def center_window(self):
         # Get the screen's available geometry (excludes taskbar)
         screen = QApplication.primaryScreen().availableGeometry()
         
-        # Get the window size after it's been shown
-        self.show()
+        # Get the window size
         window_size = self.frameGeometry()
         
         # Calculate center point
@@ -136,45 +158,51 @@ class MoodWindow(QWidget):
         window_size.moveCenter(center_point)
         self.move(window_size.topLeft())
         
-        # Hide the window if it wasn't meant to be shown yet
-        if not self.isVisible():
-            self.hide()
- 
+        # Show the window
+        self.show()
+
     def init_ui(self):
-        self.main_layout = QVBoxLayout()
+        self.main_layout = QVBoxLayout(self.central_widget)  # Set layout on central widget
         self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(20)
 
         # Top layout for logo and label
         top_layout = QHBoxLayout()
-        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setContentsMargins(0, 30, 0, 0)  # Added 30px top margin
         top_layout.setSpacing(20)
 
         # Label
         label = QLabel("How did yesterday treat you?")
-        label.setObjectName("question_label")  # Add object name to find it later
+        label.setObjectName("question_label")
         label.setStyleSheet("""
             font-size: 24px;
             font-weight: bold;
             color: #003049;
             background: transparent;
+            margin-top: 10px;
+            margin-left: 40px;  /* Added left margin to shift text right */
         """)
         label.setAlignment(Qt.AlignCenter)
-        top_layout.addWidget(label, 1, alignment=Qt.AlignCenter)  # Add stretch factor of 1
+        top_layout.addWidget(label, 1)
 
         # Logo
-        logo_label = QLabel()
-        logo_pixmap = QPixmap("Shorthills Logo Light Bg.png")  # Fixed logo path
-        logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        top_layout.addWidget(logo_label, alignment=Qt.AlignRight)
+        self.logo_label = QLabel()
+        logo_pixmap = QPixmap("Shorthills Logo Light Bg.png")
+        self.logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        top_layout.addWidget(self.logo_label)
 
         # Add top layout to main layout
         self.main_layout.addLayout(top_layout)
 
+        # Add spacer to push content to center
+        self.main_layout.addStretch(2)  # Increased weight for top stretch
+
         # Emoji buttons layout
         self.button_layout = QHBoxLayout()
         self.button_layout.setSpacing(30)
+        self.button_layout.setAlignment(Qt.AlignCenter)
 
+        self.emoji_layouts = []  # Initialize the list
         for emoji, state in EMOJI_STATE_MAP.items():
             emoji_layout = QVBoxLayout()
             emoji_layout.setSpacing(5)
@@ -216,12 +244,14 @@ class MoodWindow(QWidget):
             text_label.setAlignment(Qt.AlignCenter)
             emoji_layout.addWidget(text_label, alignment=Qt.AlignCenter)
             self.button_layout.addLayout(emoji_layout)
-            self.emoji_layouts.append(emoji_layout)  # ✅ Store layout reference
+            self.emoji_layouts.append(emoji_layout)
 
-        self.button_layout.setAlignment(Qt.AlignCenter)
         self.main_layout.addLayout(self.button_layout)
 
-        self.send_button = QPushButton("Send")  # ✅ Store send button
+        # Add spacer to push content to center
+        self.main_layout.addStretch(3)  # Increased weight for bottom stretch
+
+        self.send_button = QPushButton("Send")
         self.send_button.setStyleSheet("""
             QPushButton {
                 font-family: Helvetica;
@@ -249,8 +279,6 @@ class MoodWindow(QWidget):
         self.dynamic_container.setSpacing(20)
         self.main_layout.addLayout(self.dynamic_container)
 
-        self.setLayout(self.main_layout)
- 
     def on_mood_select(self, mood, button):
         if self.selected_button:
             self.selected_button.setChecked(False)
@@ -268,11 +296,10 @@ class MoodWindow(QWidget):
                     if widget:
                         widget.hide()
 
-            # Hide the question label
-            label = self.findChild(QLabel, "question_label")
-            if label:
-                label.hide()
-
+            # Hide the question label and all widgets in the top layout
+            for child in self.findChildren(QWidget):
+                if isinstance(child, QLabel):
+                    child.hide()
             if self.send_button:
                 self.send_button.hide()
 
@@ -288,6 +315,22 @@ class MoodWindow(QWidget):
         final_widget = QWidget()
         final_widget.setStyleSheet("background-color: white;")
         final_layout = QVBoxLayout(final_widget)
+        
+        # Create top layout with logo only on the right
+        top_layout = QHBoxLayout()
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(20)
+
+        # Add stretch to push logo to the right
+        top_layout.addStretch(1)
+
+        # Logo on the right
+        logo_label = QLabel()
+        logo_pixmap = QPixmap("Shorthills Logo Light Bg.png")
+        logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        top_layout.addWidget(logo_label)
+
+        final_layout.addLayout(top_layout)
         
         # Add top spacing to move content slightly above center
         top_spacer = QWidget()

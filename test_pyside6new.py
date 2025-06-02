@@ -62,12 +62,55 @@ class TestMoodCheck(unittest.TestCase):
     def test_window_initialization(self):
         """Test if the window is initialized with correct properties"""
         self.assertEqual(self.window.windowTitle(), "Mood Check-in")
-        self.assertEqual(self.window.size().width(), 800)
-        self.assertEqual(self.window.size().height(), 450)
+        self.assertEqual(self.window.minimumSize().width(), 800)
+        self.assertEqual(self.window.minimumSize().height(), 450)
         self.assertIsNone(self.window.selected_mood)
         self.assertIsNone(self.window.selected_button)
         self.assertTrue(self.window.isWindow())
-        self.assertTrue(self.window.windowFlags() & Qt.WindowCloseButtonHint)
+        self.assertTrue(self.window.windowFlags() & Qt.WindowMaximizeButtonHint)
+
+    def test_window_responsiveness(self):
+        """Test that window properly handles resizing"""
+        # Show the window to get proper window state
+        self.window.show()
+        QApplication.processEvents()
+        
+        # Get initial sizes
+        initial_size = self.window.size()
+        initial_emoji_size = None
+        initial_label_size = None
+        
+        # Find an emoji button and label for size comparison
+        for layout in self.window.emoji_layouts:
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if item and item.widget():
+                    if isinstance(item.widget(), QPushButton):
+                        initial_emoji_size = item.widget().size()
+                    elif isinstance(item.widget(), QLabel):
+                        initial_label_size = item.widget().size()
+        
+        # Resize window to double the size
+        new_size = initial_size * 1.5
+        self.window.resize(new_size)
+        QApplication.processEvents()
+        
+        # Verify elements have scaled
+        scaled = False
+        for layout in self.window.emoji_layouts:
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if item and item.widget():
+                    if isinstance(item.widget(), QPushButton):
+                        if item.widget().size().width() > initial_emoji_size.width():
+                            scaled = True
+                            break
+        
+        self.assertTrue(scaled, "UI elements should scale when window is resized")
+        self.assertTrue(self.window.logo_label.isVisible())
+        
+        # Clean up
+        self.window.hide()
 
     def test_window_center_position(self):
         """Test if window is properly centered on screen"""
