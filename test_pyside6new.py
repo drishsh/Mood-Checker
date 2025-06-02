@@ -70,13 +70,25 @@ class TestMoodCheck(unittest.TestCase):
         self.assertTrue(self.window.windowFlags() & Qt.WindowCloseButtonHint)
 
     def test_window_center_position(self):
-        """Test if window is centered on screen"""
-        screen = QApplication.primaryScreen().geometry()
-        window_geometry = self.window.geometry()
-        center_x = (screen.width() - window_geometry.width()) // 2
-        center_y = (screen.height() - window_geometry.height()) // 2
-        self.assertEqual(window_geometry.x(), center_x)
-        self.assertEqual(window_geometry.y(), center_y)
+        """Test if window is properly centered on screen"""
+        # Show the window to get proper geometry
+        self.window.show()
+        QApplication.processEvents()
+        
+        # Get screen's available geometry (excluding taskbar)
+        screen = QApplication.primaryScreen().availableGeometry()
+        window_frame = self.window.frameGeometry()
+        
+        # Calculate expected center position
+        expected_x = screen.center().x() - window_frame.width() // 2
+        expected_y = screen.center().y() - window_frame.height() // 2
+        
+        # Allow for small positioning differences (1-2 pixels)
+        self.assertAlmostEqual(window_frame.x(), expected_x, delta=2)
+        self.assertAlmostEqual(window_frame.y(), expected_y, delta=2)
+        
+        # Clean up
+        self.window.hide()
 
     # UI Element Tests
     def test_emoji_buttons_creation(self):

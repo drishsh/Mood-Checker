@@ -122,10 +122,23 @@ class MoodWindow(QWidget):
         self.init_ui()
  
     def center_window(self):
-        screen = QApplication.primaryScreen().geometry()
-        size = self.geometry()
-        self.move((screen.width() - size.width()) // 2,
-                  (screen.height() - size.height()) // 2)
+        # Get the screen's available geometry (excludes taskbar)
+        screen = QApplication.primaryScreen().availableGeometry()
+        
+        # Get the window size after it's been shown
+        self.show()
+        window_size = self.frameGeometry()
+        
+        # Calculate center point
+        center_point = screen.center()
+        
+        # Move window to center
+        window_size.moveCenter(center_point)
+        self.move(window_size.topLeft())
+        
+        # Hide the window if it wasn't meant to be shown yet
+        if not self.isVisible():
+            self.hide()
  
     def init_ui(self):
         self.main_layout = QVBoxLayout()
@@ -342,7 +355,7 @@ class MoodWindow(QWidget):
  
 def show_notification():
     app = QApplication.instance() or QApplication(sys.argv)
-    tray = QSystemTrayIcon(QIcon("path/to/icon.png"))
+    tray = QSystemTrayIcon(QIcon("Shorthills Logo Light Bg.png"))
     tray.show()
     tray.showMessage("Daily Mood Check", "Hey user, how was your day?",
                      QSystemTrayIcon.Information, 10000)
