@@ -24,12 +24,12 @@ A Python-based application built with PySide6 for tracking employee moods and ge
    ```
 3. Run the application:
    ```bash
-   python pyside6new.py
+   python main.py
    ```
 
 ## Project Structure
 
-- `pyside6new.py`: Main application file
+- `main.py`: Main application file
 - `employee_mood_data.csv`: Data storage for employee moods
 - `Shorthills Logo Light Bg.png`: Application logo
 - `last_notification.txt`: Notification tracking file

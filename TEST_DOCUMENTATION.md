@@ -44,24 +44,24 @@ This document describes the test suite for the Mood Check application. The tests
 
 ### Running All Tests
 ```bash
-pytest test_pyside6new.py -v
+pytest test_main.py -v
 ```
 
 ### Running with Coverage
 ```bash
-pytest test_pyside6new.py --cov=pyside6new -v
+pytest test_main.py --cov=main -v
 ```
 
 ### Running Specific Test Categories
 ```bash
 # Run only window tests
-pytest test_pyside6new.py -v -k "window"
+pytest test_main.py -v -k "window"
 
 # Run only UI tests
-pytest test_pyside6new.py -v -k "emoji or button"
+pytest test_main.py -v -k "emoji or button"
 
 # Run only functionality tests
-pytest test_pyside6new.py -v -k "mood"
+pytest test_main.py -v -k "mood"
 ```
 
 ## Test Coverage Areas

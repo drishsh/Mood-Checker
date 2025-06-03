@@ -7,7 +7,7 @@ from unittest.mock import patch, mock_open, MagicMock, call
 from PySide6.QtWidgets import QApplication, QPushButton, QLabel, QMessageBox, QWidget
 from PySide6.QtTest import QTest
 from PySide6.QtCore import Qt, QTimer
-from pyside6new import (
+from main import (
     MoodWindow, 
     initialize_files, 
     check_notification_eligibility,
@@ -213,7 +213,7 @@ class TestMoodCheck(unittest.TestCase):
             self.assertFalse(first_button.isChecked())
             self.assertTrue(second_button.isChecked())
 
-    @patch('pyside6new.save_mood')
+    @patch('main.save_mood')
     def test_submit_mood(self, mock_save_mood):
         """Test mood submission"""
         # Test submitting each mood
@@ -228,7 +228,7 @@ class TestMoodCheck(unittest.TestCase):
         """Test UI changes after mood submission"""
         self.window.selected_mood = "😄"
         
-        with patch('pyside6new.save_mood') as mock_save:  # Mock save_mood to avoid file operations
+        with patch('main.save_mood') as mock_save:  # Mock save_mood to avoid file operations
             # Show the window to ensure proper visibility handling
             self.window.show()
             QApplication.processEvents()
@@ -266,7 +266,7 @@ class TestMoodCheck(unittest.TestCase):
 
     @patch('getpass.getuser', return_value='test_user')
     @patch('builtins.open', new_callable=mock_open)
-    @patch('pyside6new.date')
+    @patch('main.date')
     def test_check_notification_eligibility(self, mock_date, mock_file, mock_getuser):
         """Test notification eligibility checking"""
         # Test when user has not received notification today

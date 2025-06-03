@@ -25,4 +25,21 @@ ENV/
 .idea/
 .vscode/
 *.log
-last_notification.txt 
+last_notification.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Application specific
+employee_mood_data.csv 

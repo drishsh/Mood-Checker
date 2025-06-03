@@ -125,41 +125,103 @@ class MoodWindow(QWidget):
         self.spinner_timer = None
         self.spinner_index = 0
         
-        # Create a central container widget to maintain fixed size
+        # Create a central container widget that can resize
         self.central_widget = QWidget(self)
-        self.central_widget.setFixedSize(800, 450)
+        self.central_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.central_widget.setStyleSheet("""
             background-color: #ffffff;
             border-radius: 20px;
         """)
         
         self.init_ui()
+        # Center window after showing it
+        self.show()
+        QApplication.processEvents()
         self.center_window()
 
     def resizeEvent(self, event):
-        """Handle window resize events by keeping the central widget centered"""
+        """Handle window resize events"""
         super().resizeEvent(event)
-        # Center the fixed-size central widget in the window
-        central_x = (event.size().width() - self.central_widget.width()) // 2
-        central_y = (event.size().height() - self.central_widget.height()) // 2
-        self.central_widget.move(central_x, central_y)
+        # Make central widget fill the window
+        self.central_widget.setGeometry(0, 0, event.size().width(), event.size().height())
+        
+        # Calculate new sizes based on window dimensions
+        window_width = event.size().width()
+        window_height = event.size().height()
+        
+        # Base size calculation that ensures scaling
+        base_size = min(window_width // 8, window_height // 4)
+        base_size = max(base_size, 80)  # Ensure minimum size
+        
+        # Update button sizes
+        for layout in self.emoji_layouts:
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if isinstance(item.widget(), QPushButton):
+                    button = item.widget()
+                    # Calculate sizes based on window dimensions
+                    button_width = max(base_size, window_width // 8)
+                    button_height = int(button_width * 1.1)  # Keep aspect ratio
+                    font_size = max(30, min(50, button_width // 2))
+                    
+                    # Get the emoji for this button to determine colors
+                    emoji = button.text()
+                    colors = EMOJI_COLOR_MAP.get(emoji, {"hover": "#f0f9ff", "pressed": "#d1e7ff", "checked": "#d1e7ff"})
+                    
+                    # Create a properly formatted stylesheet
+                    style = """
+                        QPushButton {
+                            font-size: %dpx;
+                            background-color: #ffffff;
+                            color: #2c3e50;
+                            border: none;
+                            border-radius: 15px;
+                            padding: 15px;
+                            min-width: %dpx;
+                            min-height: %dpx;
+                        }
+                        QPushButton:hover {
+                            background-color: %s;
+                        }
+                        QPushButton:pressed {
+                            background-color: %s;
+                        }
+                        QPushButton:checked {
+                            background-color: %s;
+                            border: 3px solid %s;
+                        }
+                    """ % (
+                        font_size,
+                        button_width,
+                        button_height,
+                        colors['hover'],
+                        colors['pressed'],
+                        colors['checked'],
+                        colors['pressed']
+                    )
+                    
+                    button.setStyleSheet(style)
+                    button.updateGeometry()
 
     def center_window(self):
-        # Get the screen's available geometry (excludes taskbar)
+        """Center the window on the screen"""
+        # Get the screen geometry
         screen = QApplication.primaryScreen().availableGeometry()
         
-        # Get the window size
-        window_size = self.frameGeometry()
+        # Get the window geometry
+        window_frame = self.frameGeometry()
         
-        # Calculate center point
+        # Calculate the center point
         center_point = screen.center()
         
-        # Move window to center
-        window_size.moveCenter(center_point)
-        self.move(window_size.topLeft())
+        # Move the window's center to the screen's center
+        window_frame.moveCenter(center_point)
         
-        # Show the window
-        self.show()
+        # Use move instead of setGeometry to preserve size
+        self.move(window_frame.x(), window_frame.y())
+        
+        # Process events to ensure the window is positioned
+        QApplication.processEvents()
 
     def init_ui(self):
         self.main_layout = QVBoxLayout(self.central_widget)  # Set layout on central widget
