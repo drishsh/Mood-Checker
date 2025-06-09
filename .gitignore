@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.coverage
+
+# Application data files
+employee_mood_data.csv
+last_notification.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp 

@@ -86,12 +86,32 @@ def update_notification_time():
             f.write(f"{user},{last_date}\n")
 
 def save_mood(mood):
+    print(f"Saving mood: {mood}")
     username = getpass.getuser()
+    print(f"Username: {username}")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"Timestamp: {timestamp}")
     state = EMOJI_STATE_MAP.get(mood, "Unknown")
-    with open(MOOD_FILE, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow([timestamp, username, mood, state])
+    print(f"State: {state}")
+    print(f"MOOD_FILE: {MOOD_FILE}")
+    print(f"File exists before saving: {os.path.exists(MOOD_FILE)}")
+    
+    try:
+        with open(MOOD_FILE, 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([timestamp, username, mood, state])
+            print("Successfully wrote to file")
+    except Exception as e:
+        print(f"Error writing to file: {e}")
+    
+    print(f"File exists after saving: {os.path.exists(MOOD_FILE)}")
+    try:
+        with open(MOOD_FILE, 'r') as f:
+            print("File contents after saving:")
+            print(f.read())
+    except Exception as e:
+        print(f"Error reading file: {e}")
+    
     update_notification_time()
 
 class MoodWindow(tk.Tk):
