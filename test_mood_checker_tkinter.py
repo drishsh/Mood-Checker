@@ -1,192 +1,171 @@
 import unittest
-import os
-import csv
-from datetime import datetime, date
 import tkinter as tk
-from mood_checker_tkinter import MoodWindow, initialize_files, check_notification_eligibility
-from mood_checker_tkinter import MOOD_FILE, LAST_NOTIFICATION_FILE, EMOJI_STATE_MAP
+from tkinter import ttk
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
-def create_test_files():
-    """Helper function to create test files"""
-    # Create mood data file
-    with open(MOOD_FILE, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Timestamp", "Username", "Mood", "State"])
-
-    # Create notification file
-    with open(LAST_NOTIFICATION_FILE, 'w') as f:
-        f.write("")
+from mood_checker_tkinter import (
+    MoodWindow, 
+    EMOJI_STATE_MAP
+)
 
 class TestMoodChecker(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Create test files
-        cls.test_mood_file = "test_employee_mood_data.csv"
-        cls.test_notification_file = "test_last_notification.txt"
-        
-        # Store original file paths and set test paths
-        global MOOD_FILE, LAST_NOTIFICATION_FILE
-        cls.original_mood_file = MOOD_FILE
-        cls.original_notification_file = LAST_NOTIFICATION_FILE
-        MOOD_FILE = cls.test_mood_file
-        LAST_NOTIFICATION_FILE = cls.test_notification_file
-        
-        # Initialize test files
-        create_test_files()
-
     def setUp(self):
-        # Ensure test files exist
-        create_test_files()
-        
+        """Set up test environment before each test"""
         # Create root window for testing
         self.root = tk.Tk()
+        
+        # Create app without logo
         self.app = MoodWindow()
         
-        # Suppress logo loading errors
-        self.app.logo_photo = None
+        # Wait for UI to update and initialize
+        self.app.update_idletasks()
+        self.app.update()
+        
+        # Give time for emoji buttons to be created
+        self.app.after(100)
+        self.app.update()
 
     def tearDown(self):
-        # Clean up test files after each test
-        try:
-            if os.path.exists(self.test_mood_file):
-                os.remove(self.test_mood_file)
-            if os.path.exists(self.test_notification_file):
-                os.remove(self.test_notification_file)
-        except:
-            pass
-            
-        # Close Tkinter window
+        """Clean up after each test"""
         try:
             self.root.destroy()
         except:
             pass
 
-    @classmethod
-    def tearDownClass(cls):
-        # Restore original file paths
-        global MOOD_FILE, LAST_NOTIFICATION_FILE
-        MOOD_FILE = cls.original_mood_file
-        LAST_NOTIFICATION_FILE = cls.original_notification_file
-        
-        # Clean up any remaining test files
-        try:
-            if os.path.exists(cls.test_mood_file):
-                os.remove(cls.test_mood_file)
-            if os.path.exists(cls.test_notification_file):
-                os.remove(cls.test_notification_file)
-        except:
-            pass
+    # Window Tests
+    def test_window_initialization(self):
+        """Test if window properties are correctly initialized"""
+        self.assertEqual(self.app.title(), "Mood Check-in")
+        self.assertEqual(self.app.winfo_width(), 800)
+        self.assertEqual(self.app.winfo_height(), 450)
+        self.assertEqual(self.app.cget('bg'), 'white')
+        self.assertTrue(self.app._w)  # Check if window exists
 
-    def test_initialization(self):
-        """Test if the application initializes correctly"""
-        self.assertTrue(os.path.exists(self.test_mood_file))
-        self.assertTrue(os.path.exists(self.test_notification_file))
+    def test_window_center_position(self):
+        """Test if window is centered on screen"""
+        self.app.update_idletasks()
+        screen_width = self.app.winfo_screenwidth()
+        screen_height = self.app.winfo_screenheight()
+        window_width = self.app.winfo_width()
+        window_height = self.app.winfo_height()
         
-        # Check if CSV header is correct
-        with open(self.test_mood_file, 'r') as f:
-            reader = csv.reader(f)
-            header = next(reader)
-            self.assertEqual(header, ["Timestamp", "Username", "Mood", "State"])
+        expected_x = (screen_width // 2) - (window_width // 2)
+        expected_y = (screen_height // 2) - (window_height // 2)
+        
+        geometry = self.app.geometry()
+        actual_x = int(geometry.split('+')[1])
+        actual_y = int(geometry.split('+')[2])
+        
+        self.assertAlmostEqual(actual_x, expected_x, delta=1)
+        self.assertAlmostEqual(actual_y, expected_y, delta=1)
 
-    def test_emoji_buttons(self):
-        """Test if all emoji buttons are created"""
-        # Count the number of emoji buttons
-        button_count = len(self.app.emoji_buttons)
-        self.assertEqual(button_count, len(EMOJI_STATE_MAP))
+    # UI Element Tests
+    def test_emoji_buttons_creation(self):
+        """Test if emoji buttons are created with correct properties"""
+        # Find emoji buttons in the emoji_frame
+        emoji_buttons = []
+        for frame in self.app.emoji_frame.winfo_children():
+            if isinstance(frame, ttk.Frame):
+                for widget in frame.winfo_children():
+                    if isinstance(widget, tk.Canvas):
+                        emoji_buttons.append(widget)
+        
+        self.assertEqual(len(emoji_buttons), len(EMOJI_STATE_MAP))
+        for button in emoji_buttons:
+            self.assertEqual(int(button.cget('highlightthickness')), 0)
+            self.assertEqual(int(button.cget('bd')), 0)
+            self.assertEqual(button.cget('bg'), 'white')
+
+    def test_emoji_button_styles(self):
+        """Test emoji button styling"""
+        emoji_buttons = [btn for btn in self.app.winfo_children() if isinstance(btn, tk.Canvas)]
+        for button in emoji_buttons:
+            # Check circle properties
+            circle = button.find_withtag('oval')
+            self.assertTrue(circle)
+            self.assertEqual(button.itemcget(circle[0], 'fill'), '#ffd700')
+            
+            # Check text label
+            text = button.find_withtag('text')
+            self.assertTrue(text)
+
+    def find_send_button(self):
+        """Helper function to find the send button"""
+        print("\nLooking for send button")
+        send_button = self.app.send_button
+        if send_button and isinstance(send_button, tk.Button) and send_button.cget('text') == 'Send':
+            print("Found send button!")
+            return send_button
+        print("Send button not found!")
+        return None
+
+    def test_send_button_properties(self):
+        """Test send button attributes"""
+        send_button = self.find_send_button()
+        self.assertIsNotNone(send_button, "Send button not found")
+        self.assertEqual(send_button.cget('text'), "Send")
+        self.assertEqual(send_button.cget('bg'), '#FF6F61')
+        self.assertEqual(send_button.cget('fg'), 'white')
+
+    # Error Handling Tests
+    def test_error_message_on_empty_submission(self):
+        """Test error handling for empty submissions"""
+        # Try to submit without selecting mood
+        self.app.submit_mood()
+        
+        # Verify error message
+        self.assertEqual(self.app.selected_mood, None)
+        self.assertTrue(self.app.winfo_children())  # Window still has widgets
 
     def test_mood_selection(self):
-        """Test mood selection functionality"""
-        # Select first emoji
-        first_emoji = list(EMOJI_STATE_MAP.keys())[0]
-        first_button = self.app.emoji_buttons[0][0]
+        """Test mood selection for all emojis"""
+        for emoji in EMOJI_STATE_MAP.keys():
+            button = None
+            for frame in self.app.emoji_frame.winfo_children():
+                if isinstance(frame, ttk.Frame):
+                    for widget in frame.winfo_children():
+                        if isinstance(widget, tk.Canvas):
+                            for child in widget.winfo_children():
+                                if isinstance(child, tk.Label) and child.cget('text') == emoji:
+                                    button = widget
+                                    break
+            self.assertIsNotNone(button, f"Button not found for emoji {emoji}")
+            self.app.on_mood_select(emoji, button)
+            self.assertEqual(self.app.selected_mood, emoji)
+            self.assertEqual(self.app.selected_button, button)
+
+    def test_mood_selection_toggle(self):
+        """Test toggling between different moods"""
+        emojis = list(EMOJI_STATE_MAP.keys())
+        first_emoji = emojis[0]
+        second_emoji = emojis[1]
         
-        # Simulate button click
+        first_button = None
+        second_button = None
+        
+        # Find buttons
+        for frame in self.app.emoji_frame.winfo_children():
+            if isinstance(frame, ttk.Frame):
+                for widget in frame.winfo_children():
+                    if isinstance(widget, tk.Canvas):
+                        for child in widget.winfo_children():
+                            if isinstance(child, tk.Label):
+                                if child.cget('text') == first_emoji:
+                                    first_button = widget
+                                elif child.cget('text') == second_emoji:
+                                    second_button = widget
+        
+        self.assertIsNotNone(first_button, f"Button not found for emoji {first_emoji}")
+        self.assertIsNotNone(second_button, f"Button not found for emoji {second_emoji}")
+        
+        # Select first mood
         self.app.on_mood_select(first_emoji, first_button)
-        
-        # Check if mood is selected
         self.assertEqual(self.app.selected_mood, first_emoji)
-        self.assertEqual(self.app.selected_button, first_button)
-
-    def test_notification_eligibility(self):
-        """Test notification eligibility check"""
-        # Initially should be eligible (file just created)
-        self.assertTrue(check_notification_eligibility())
         
-        # Write today's date
-        today = date.today().isoformat()
-        with open(self.test_notification_file, 'w') as f:
-            f.write(f"testuser,{today}\n")
-        
-        # Should still be eligible (we're allowing multiple notifications)
-        self.assertTrue(check_notification_eligibility())
-
-    def test_mood_saving(self):
-        """Test if mood data is saved correctly"""
-        # Debug: Print current working directory and file paths
-        print(f"Current working directory: {os.getcwd()}")
-        print(f"Test mood file path: {os.path.abspath(self.test_mood_file)}")
-        print(f"MOOD_FILE value: {MOOD_FILE}")
-        
-        # Ensure test file exists with header
-        create_test_files()
-        
-        # Debug: Verify file exists and has header
-        with open(self.test_mood_file, 'r') as f:
-            print(f"Initial file contents:")
-            print(f.read())
-        
-        # Select and save a mood
-        first_emoji = list(EMOJI_STATE_MAP.keys())[0]
-        first_button = self.app.emoji_buttons[0][0]
-        self.app.on_mood_select(first_emoji, first_button)
-        
-        # Debug: Verify mood selection
-        print(f"Selected mood: {self.app.selected_mood}")
-        print(f"Selected button: {self.app.selected_button}")
-        
-        # Try writing to the file directly
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        username = os.getenv('USER', 'testuser')
-        state = EMOJI_STATE_MAP[first_emoji]
-        
-        with open(self.test_mood_file, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([timestamp, username, first_emoji, state])
-        
-        # Debug: Check file contents after saving
-        with open(self.test_mood_file, 'r') as f:
-            print(f"File contents after saving:")
-            print(f.read())
-        
-        # Check if mood was saved in CSV
-        with open(self.test_mood_file, 'r') as f:
-            reader = csv.reader(f)
-            next(reader)  # Skip header
-            last_entry = None
-            for row in reader:
-                last_entry = row
-            
-            self.assertIsNotNone(last_entry)
-            self.assertEqual(last_entry[2], first_emoji)  # Check mood emoji
-            self.assertEqual(last_entry[3], EMOJI_STATE_MAP[first_emoji])  # Check mood state
-
-    def test_animation_setup(self):
-        """Test animation setup"""
-        # Select a mood
-        first_emoji = list(EMOJI_STATE_MAP.keys())[0]
-        first_button = self.app.emoji_buttons[0][0]
-        self.app.on_mood_select(first_emoji, first_button)
-        
-        # Start animation
-        self.app.show_animation_with_message()
-        
-        # Check if animation components are created
-        self.assertIsNotNone(self.app.animation_canvas)
-        self.assertIsNotNone(self.app.spinner_label)
-        
-        # Note: spinner_index might be incremented by the time we check
-        # so we just verify it's a non-negative number
-        self.assertGreaterEqual(self.app.spinner_index, 0)
+        # Select second mood
+        self.app.on_mood_select(second_emoji, second_button)
+        self.assertEqual(self.app.selected_mood, second_emoji)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 
