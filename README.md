@@ -11,7 +11,7 @@ A Python-based application built with Tkinter for tracking employee moods and ge
 * Native GUI interface built with Tkinter
 * Notification system
 * Shorthills branding integration
-* Microsoft Intune deployment support for enterprise-wide installation
+* Cross-platform deployment support (Windows 11, Ubuntu 22.04, macOS M1)
 
 ## Requirements
 
@@ -36,77 +36,88 @@ A Python-based application built with Tkinter for tracking employee moods and ge
    python mood_checker_tkinter.py
    ```
 
-## Enterprise Deployment with Microsoft Intune
+## Enterprise Deployment
 
-### Prerequisites
-* Microsoft Intune admin access
-* Ubuntu Linux systems (target machines)
-* Git installed on deployment machine
+### Platform-Specific Deployment Scripts
 
-### Deployment Steps
+The application includes deployment scripts for three major platforms:
 
-1. **Prepare the Package**:
-   ```bash
-   # Clone the repository
-   git clone https://github.com/drishsh/Mood-Checker.git
-   cd Mood-Checker
-   git checkout version-1.2
+#### Windows 11 Deployment
+1. Open PowerShell as Administrator
+2. Navigate to the project directory
+3. Run the Windows deployment script:
+   ```powershell
+   .\platform_scripts\windows_11_deploy.ps1
    ```
+- Installs Python 3.10 if not present
+- Creates application directory in Program Files
+- Sets up virtual environment
+- Creates Start Menu and startup shortcuts
+- Logs deployment process to `C:\ProgramData\MoodChecker\deployment.log`
 
-2. **In Microsoft Endpoint Manager Admin Center**:
-   1. Go to Apps > All apps > Add
-   2. Select "Line-of-business app" as the app type
-   3. Select "Other" as the app type
-   4. Upload the following files:
-      * mood_checker_tkinter.py
-      * Mood_checker_deployement.sh
-      * requirements.txt
-      * Shorthills Logo Light Bg.png
+#### Ubuntu 22.04 Deployment
+1. Open Terminal
+2. Navigate to the project directory
+3. Run the Ubuntu deployment script:
+   ```bash
+   sudo bash platform_scripts/ubuntu_22_deploy.sh
+   ```
+- Installs system dependencies
+- Creates application directory in /opt
+- Sets up virtual environment
+- Creates desktop entry and autostart
+- Logs deployment process to `/var/log/mood_checker_deployment.log`
 
-3. **Configure App Information**:
-   * Name: Project Mood Check
-   * Description: Employee Mood Tracking Application
-   * Publisher: Your Company Name
-   * App Version: 1.2
-   * Category: Business
+#### macOS M1 Deployment
+1. Open Terminal
+2. Navigate to the project directory
+3. Run the macOS deployment script:
+   ```bash
+   sudo bash platform_scripts/macos_m1_deploy.sh
+   ```
+- Installs Homebrew and Python 3.10
+- Creates application in /Applications
+- Sets up virtual environment
+- Creates launch agent for autostart
+- Logs deployment process to `/var/log/mood_checker_deployment.log`
 
-4. **Program Settings**:
-   * Installation command: `sudo bash Mood_checker_deployement.sh`
-   * Installation behavior: System
-   * Device restart behavior: No restart required
+### Installation Locations
 
-5. **Requirements**:
-   * Operating system architecture: 64-bit
-   * Minimum operating system: Ubuntu 20.04 or later
+- Windows: `C:\Program Files\Project_Mood_Check`
+- Ubuntu: `/opt/Project_Mood_Check`
+- macOS: `/Applications/Project_Mood_Check`
 
-6. **Detection Rules**:
-   * Rule type: File exists
-   * Path: /opt/Project_Mood_Check
-   * File or folder: mood_checker_tkinter.py
-   * Detection method: File or folder exists
+### Logging
 
-7. **Assignments**:
-   * Required: Select your target group of devices
-   * Available for enrolled devices: Yes
-
-### Post-Deployment
-
-The application will:
-* Install automatically on target systems
-* Create desktop shortcuts for all users
-* Auto-start with system boot
-* Store data in `/opt/Project_Mood_Check`
+All deployment scripts include detailed logging:
+- Windows: `C:\ProgramData\MoodChecker\deployment.log`
+- Ubuntu: `/var/log/mood_checker_deployment.log`
+- macOS: `/var/log/mood_checker_deployment.log`
 
 ### Troubleshooting
 
-* Check logs at `/var/log/mood_checker_deployment.log`
-* Verify installation at `/opt/Project_Mood_Check`
-* Check desktop entry at `/usr/share/applications/mood-checker.desktop`
+#### Windows
+- Check Windows Event Viewer for Python installation issues
+- Verify PowerShell execution policy allows script execution
+- Ensure administrative privileges
+
+#### Ubuntu
+- Check system logs: `sudo journalctl -xe`
+- Verify Python and Tkinter installation: `python3 -m tkinter`
+- Check desktop entry permissions
+
+#### macOS
+- Check system logs: `console.app`
+- Verify Homebrew installation: `brew doctor`
+- Check launch agent status: `launchctl list | grep moodcheck`
 
 ## Project Structure
 
-* `mood_checker_tkinter.py`: Main application file with Tkinter implementation
-* `Mood_checker_deployement.sh`: Enterprise deployment script
+* `mood_checker_tkinter.py`: Main application file
+* `platform_scripts/`: Platform-specific deployment scripts
+  * `windows_11_deploy.ps1`: Windows 11 deployment script
+  * `ubuntu_22_deploy.sh`: Ubuntu 22.04 deployment script
+  * `macos_m1_deploy.sh`: macOS M1 deployment script
 * `requirements.txt`: Python package dependencies
 * `Shorthills Logo Light Bg.png`: Application logo
 * `TESTING.md`: Testing documentation
@@ -114,12 +125,12 @@ The application will:
 
 ## Changes in v1.2
 
+* Added cross-platform deployment scripts
 * Migrated from PySide6 to Tkinter for better native integration
 * Improved button aesthetics with perfect circular shapes
 * Enhanced animation system
 * Optimized performance with reduced dependencies
 * Added hover effects and smooth color transitions
-* Added enterprise deployment support via Microsoft Intune
 
 ## License
 
