@@ -1,4 +1,4 @@
-# Mood Check Application (v1.2)
+# Project Mood Check (v1.2)
 
 A Python-based application built with Tkinter for tracking employee moods and generating notifications. This version uses Tkinter and Pillow for the GUI interface, providing a lightweight and native look and feel.
 

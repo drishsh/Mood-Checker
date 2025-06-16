@@ -171,7 +171,7 @@ class MoodWindow(tk.Tk):
         super().__init__()
 
         # Configure the window
-        self.title("Mood Check-in")
+        self.title("Project Mood Check")
         self.geometry("800x450")
         self.configure(bg='white')
         self.resizable(True, True)
