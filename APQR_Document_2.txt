@@ -1,0 +1,168 @@
+Annual Product Quality Review (APQR) - US Template 
+
+Manufacturer: Bayer 
+
+Product: Aspirin 325 mg - Tablet 
+
+Review Period: [Start Date] to [End Date] 
+
+Document ID: [DOC-ID] 
+
+Version: [vX.X] 
+
+Prepared by: [Name, Function]    Date: [dd-mmm-yyyy] 
+
+Approved by: [Name, Function]     Date: [dd-mmm-yyyy] 
+
+Table of Contents 
+
+1. Objective and Scope 
+
+2. Product Identification & Background 
+
+3. Executive Summary 
+
+4. Manufacturing & Batch Records Summary 
+
+5. Quality Control / QC Results Summary 
+
+6. Trend Analysis and Statistical Review 
+
+7. Deviations, OOS/OOT and CAPA Summary 
+
+8. Stability Program and Results 
+
+9. Supplier and Materials Review 
+
+10. Change Control and Regulatory Commitments 
+
+11. Validation and Equipment Qualification Summary 
+
+12. Complaints, Recalls and Market Actions 
+
+13. Inspection and Audit Findings 
+
+14. Conclusions and Recommendations 
+
+15. Action Plan (Owners & Timelines) 
+
+16. Appendices / Attachments 
+
+1. Objective and Scope 
+
+State the objective of the APQR and the scope (sites, markets, strengths, dosage forms). 
+
+2. Product Identification & Background 
+
+Product name, brand, generic, registration/licence numbers, formulation summary, pack sizes, shelf life, storage conditions, and manufacturing sites. 
+
+3. Executive Summary 
+
+High level summary of manufacturing performance, quality status, and any major issues during the review period. 
+
+4. Manufacturing & Batch Records Summary 
+
+Number of batches manufactured, yields, reworks, rejections, deviations per batch, critical process parameter summary. Include table(s). 
+
+[Insert Batch Summary Table / Link to Appendix A] 
+
+5. Quality Control / QC Results Summary 
+
+Summary of analytical results, conformance to specification, OOS/OOT results and their disposition. 
+
+[Insert QC Summary Table / Link to Appendix B] 
+
+6. Trend Analysis and Statistical Review 
+
+Statistical analysis of key quality attributes, control charts, impurity trends, assay degradation, dissolution trends etc. Attach charts in appendix. 
+
+[Insert Trend Charts / Link to Appendix C] 
+
+7. Deviations, OOS/OOT and CAPA Summary 
+
+Summarize major deviations, OOS/OOT investigations, CAPA status, effectiveness checks and timelines. 
+
+[Insert Deviations & CAPA Table / Link to Appendix D] 
+
+8. Stability Program and Results 
+
+Summarize ongoing stability program, any failures or out-of-trend results, proposed or executed stability actions. 
+
+[Insert Stability Summary / Link to Appendix E] 
+
+9. Supplier and Materials Review 
+
+Review of critical starting materials, API and excipient supplier performance, change notifications, supplier audits. 
+
+[Insert Supplier Performance Table / Link to Appendix F] 
+
+10. Change Control and Regulatory Commitments 
+
+List of all change controls affecting the product, post-approval commitments and regulatory variations during the review period. 
+
+11. Validation and Equipment Qualification Summary 
+
+Process validation status, cleaning validation, analytical method revalidations, equipment qualification activities and outcomes. 
+
+12. Complaints, Recalls and Market Actions 
+
+Summary of product complaints, field actions, recalls, medical information trends and any market surveillance data. 
+
+13. Inspection and Audit Findings 
+
+Summary of any regulatory inspections, internal/external audits, observations and closure status. 
+
+14. Conclusions and Recommendations 
+
+Overall suitability of current specifications and controls, recommendation for revalidation, specification changes, supplier changes or other quality improvements. 
+
+15. Action Plan (Owners & Timelines) 
+
+Table of required actions, owners, target due dates and status. 
+
+[Insert Action Plan Table / Link to Appendix G] 
+
+16. Appendices / Attachments 
+
+Appendix A: Batch Summary Table 
+Appendix B: QC Data 
+Appendix C: Trend Charts 
+Appendix D: Deviations & CAPA Details 
+Appendix E: Stability Data 
+Appendix F: Supplier Performance 
+Appendix G: Action Tracking Log 
+Appendix H: Relevant SOPs and References 
+
+Regulatory & Standards Notes (tailored) 
+
+Template aligned with US FDA expectations (21 CFR 211.180(e)). Include review of production and control records, returned or salvaged product reviews, and trend analysis as applicable. Reference: 21 CFR Part 211, ICH Q7/Q9/Q10. 
+
+Template Checklist 
+
+Cover page with manufacturer, product, review period, and approvals 
+
+Batch count and yield summary 
+
+QC pass/fail and OOS/OOT disposition summaries 
+
+Trend charts for key attributes 
+
+Summary of deviations and CAPAs with effectiveness 
+
+Stability trending and proposed actions 
+
+Supplier performance review 
+
+Change controls and regulatory commitments list 
+
+Validation & qualification summary 
+
+Appendix with raw data and charts 
+
+Signature block and document control metadata 
+
+Document Control 
+
+Document owner: QA 
+Retention: As per site Record Retention SOP (minimum [X] years) 
+Distribution: QA, Site Head, Manufacturing, QC, Regulatory Affairs, Supply Chain
